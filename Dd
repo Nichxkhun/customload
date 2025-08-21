@@ -1,13 +1,13 @@
 const config = require("../config.json");
 
 module.exports = (client) => {
-  client.once("ready", () => {
+  client.once("ready", async () => {
     console.log("🟢 Dot task started...");
 
     const sendDot = async () => {
-      const promises = config.dotChannels.map(async (channelId) => {
+      for (const channelId of config.dotChannels) {
         const channel = client.channels.cache.get(channelId);
-        if (!channel) return;
+        if (!channel) continue;
 
         try {
           const msg = await channel.send({
@@ -18,12 +18,10 @@ module.exports = (client) => {
         } catch (err) {
           console.error("❌ Error sending dot:", err.message);
         }
-      });
-
-      await Promise.all(promises);
+      }
     };
 
-    // ส่ง dot ทุก 1 ชั่วโมง (3600000 ms)
+    await sendDot();
     setInterval(sendDot, 60 * 60 * 1000);
   });
 };
